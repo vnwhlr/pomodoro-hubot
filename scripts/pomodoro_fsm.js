@@ -1,4 +1,6 @@
-var events = require('./events.js')
+var _ = require('lodash');
+var machina = require('machina');
+var Events = require('./events.js')
 
 var DEFAULT_SETTINGS = Object.freeze({
   numberOfPomodoros: 8,
@@ -26,14 +28,14 @@ var machine = {
 
     doingPomodoro: {
       _onEnter: function() {
-        this.emit(events.POMODORO_STARTED);
+        this.emit(Events.POMODORO_STARTED);
         this.timer = setTimeout(function() {
           this.handle("done");
         }.bind(this), this.pomodoroLength);
       },
       _reset: "ending",
       done: function() {
-        this.emit(events.POMODORO_DONE);
+        this.emit(Events.POMODORO_DONE);
 
         this.pomodorosRemaining--;
         if(this.pomodorosRemaining <= 0) {
@@ -62,21 +64,22 @@ var machine = {
 
     ending: {
       _onEnter: function() {
-        this.emit(events.POMODOROS_DONE);
+        this.emit(Events.POMODOROS_DONE);
         this.transition("inactive");
       }
     }
   }
 }
 
-module.exports = function(user, settings) {
+function Pomodoro(user, settings) {
   var settings ||= defaultSettings;
-  var pomodoroMachine = new machine.Fsm(machine.merge(settings));
+  var pomodoroMachine = new machina.Fsm(_.merge(machine, settings));
 
   return {
     begin: function() { pomodoroMachine.handle("begin") },
     start: function() { pomodoroMachine.handle("start") },
     end: function() { pomodoroMachine.reset() }
-  };
-});
+  }
+}
 
+module.exports = Pomodoro;

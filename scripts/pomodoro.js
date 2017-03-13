@@ -1,8 +1,8 @@
-var events = require('./events.js');
-var pomManager = require('./pomodoro_manager.js');
+var Events = require('./events.js');
+var PomodoroManager = require('./pomodoro_manager.js');
 
 module.exports = function(robot) {
-  var pomodoroManager = pomManager(robot);
+  var pomodoroManager = new PomodoroManager(robot);
 
   function withPomodoro(f) {
     return function(msg) {

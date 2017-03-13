@@ -1,12 +1,12 @@
-var events = require('./events.js');
-var pomodoro = require('./pomodoro_fsm.js');
+var Events = require('./events.js');
+var Pomodoro = require('./pomodoro_fsm.js');
 
 // TODO: persist to hubot-brain
-module.exports = function(robot) {
+var PomodoroManager = function(robot) {
   var pomodoros = {};
 
   function subscribeToEvents(pomodoroMachine) {
-    events.forEach(function(event) {
+    _.each(Events, function(event) {
       pomodoroMachine.on(event, function(data) {
         robot.emit(event, {
           user: this.user,
@@ -21,7 +21,7 @@ module.exports = function(robot) {
   }
 
   function createFor(user) {
-    var pom = pomodoro(user);
+    var pom = new Pomodoro(user);
     subscribeToEvents(pom);
     persist(user, pom);
     return pom;
@@ -52,3 +52,5 @@ module.exports = function(robot) {
     removeFor: removeFor
   }
 }
+
+module.exports = PomodoroManager;
